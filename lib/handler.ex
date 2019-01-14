@@ -1,16 +1,15 @@
 defmodule Otaku.Handler do
   @moduledoc "Handler for http requests"
+
+  @image_key "image"
+  @auth_key "authorization"
+
   use Plug.Router
-  #  use Ok.Pipe
   require Logger
 
   plug Plug.Logger
-  #  plug Plug.MIME
 
   plug Plug.Parsers, parsers: [:json, :multipart], json_decoder: Poison
-  #  config :plug, :mimes, %{
-  #    "image/png" => ["png"]
-  #  }
   plug :match
   plug :dispatch
 
@@ -19,37 +18,64 @@ defmodule Otaku.Handler do
   end
 
   def start_link do
-    # NOTE: This starts Cowboy listening on the default port of 4000
     { :ok, _ } = Plug.Adapters.Cowboy.http(__MODULE__, [])
   end
 
-  post "/upload" do
-    memes = conn.body_params["image"]
-    %Plug.Upload{ :path => path } = memes
-    IO.inspect memes
-    with { :ok, bin } <- File.read! path
-      # { :ok, token } <- extract_jwt(conn.body_params),
-      # { :ok, image } <- extract_image(conn.req_headers),
-      # { :ok, verify } <- verify_token(token)
+  defp words(string) do
+    string
+    |> String.split(" ")
+  end
 
+  post "/upload" do
+    headers = Enum.into(conn.req_headers, %{ })
+
+    with { :ok, image } = get_image(conn.body_params),
+         { :ok, { auth_type, jwt } } <- get_auth_header(headers),
+         { :ok, _ } <- verify_auth(auth_type),
+         { :ok, token } <- verify_token(jwt),
+         { :ok, res } <- Otaku.Uploader.upload_image(image, token["user_id"])
       do
-      IO.inspect bin
-      HTTPoison.put()
-      send_resp(conn, 200, Poison.encode!(memes))
+      send_resp(conn, 200, Poison.encode!(%{ "url" => res }))
     else
       err ->
-        IO.inspect err
-        { code, reason } = err
-                           |> handle_error
-                           |> Poison.encode!
-        send_resp(conn, code, reason)
+        IO.inspect(err)
+        { code, reason } = handle_error err
+        send_resp(conn, code, Poison.encode!(reason))
     end
   end
 
-  defp verify_token(token) do
-    case Jwt.verify(token) do
+  defp get_image(body) do
+    if Map.has_key?(body, @image_key) do
+      image = body[@image_key]
+      IO.inspect image
+      { :ok, image }
+    else
+      { :input_error, "Expected an image under the name 'image' inside form data but found none." }
+    end
+  end
+
+  defp get_auth_header(headers) do
+    if Map.has_key?(headers, @auth_key) do
+      auth = headers[@auth_key]
+      IO.inspect auth
+      [auth_type, jwt] = words auth
+      { :ok, { auth_type, jwt } }
+    else
+      { :jwt_error, "Missing Authorization header" }
+    end
+  end
+
+  defp verify_token(auth) do
+    case Jwt.verify(auth) do
       { :ok, out } -> { :ok, out }
       { :error, reason } -> { :jwt_error, reason }
+    end
+  end
+
+  defp verify_auth(auth) do
+    case auth do
+      "Bearer" -> { :ok, nil }
+      _ -> { :jwt_error, "Invalid Authorization type" }
     end
   end
 
@@ -60,26 +86,5 @@ defmodule Otaku.Handler do
       { :input_error, reason } -> { 400, %{ "malformed_input" => reason } }
       { _, reason } -> { 500, %{ "error" => reason } }
     end
-  end
-
-  defp get_input(body, key, location \\ "request") do
-    if Map.has_key?(body, key) do
-      val = Map.get(body, key)
-      { :ok, val }
-    else
-      { :input_error, missing_input(key, location) }
-    end
-  end
-
-  defp missing_input(type, location), do: "Missing '#{type}' value in #{location}"
-
-  defp extract_jwt(headers) do
-    IO.inspect headers
-    auth = get_input(headers, "Authorization", "header")
-    1
-  end
-
-  defp extract_image(body) do
-    get_input(body, "image")
   end
 end
