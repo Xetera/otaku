@@ -23,4 +23,8 @@ defmodule Otaku.Uploader do
       { _, reason } -> { :upload_error, reason }
     end
   end
+
+  def upload_image(_, _) do
+    { :error, "Unexpected file" }
+  end
 end

@@ -8,7 +8,7 @@ defmodule Otaku.Server do
     import Supervisor.Spec, warn: false
 
     if Otaku.Uploader.access_key() == nil do
-      Logger.error "OTAKU_ACCES_KEY environment variable required but not found"
+      Logger.error "OTAKU_ACCESS_KEY environment variable required but not found"
       exit(:shutdown)
     end
 
