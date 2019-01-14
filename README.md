@@ -8,7 +8,7 @@ A simple jwt based image upload server that works off bunny CDN
 ## Building for development
 
 1. `mix deps.get`
-2. `ies -S `
+2. `iex -S mix`
 
 ## Building for production
 
