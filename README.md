@@ -1,21 +1,6 @@
 # Otaku
 
-**TODO: Add description**
+A simple jwt based image upload server that works off bunny CDN
 
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `otaku` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:otaku, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/otaku](https://hexdocs.pm/otaku).
+![](https://pm1.narvii.com/5824/13b53b8e3e490c86d1963e9648e2bf6a949a8e0c_hq.jpg)
 

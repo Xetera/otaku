@@ -13,7 +13,7 @@ defmodule Otaku.MixProject do
 
   def application do
     [
-      applications: [:jwt, :ok],
+      applications: [:jwt, :plug_cowboy, :poison],
       extra_applications: [:logger],
       mod: { Otaku.Server, [] }
     ]
@@ -21,11 +21,11 @@ defmodule Otaku.MixProject do
 
   defp deps do
     [
+      { :distillery, "~> 1.5.2" },
       { :plug_cowboy, "~> 1.0" },
       { :cowboy, "~> 1.0.3" },
       { :plug, "~> 1.5" },
       { :poison, "~> 3.0" },
-      { :ok, "~> 2.0" },
       { :httpoison, "~> 1.4" },
       { :jwt, git: "https://github.com/amezcua/jwt-google-tokens.git", branch: "master" }
     ]

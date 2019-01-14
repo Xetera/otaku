@@ -29,7 +29,7 @@ defmodule Otaku.Handler do
   post "/upload" do
     headers = Enum.into(conn.req_headers, %{ })
 
-    with { :ok, image } = get_image(conn.body_params),
+    with { :ok, image } <- get_image(conn.body_params),
          { :ok, { auth_type, jwt } } <- get_auth_header(headers),
          { :ok, _ } <- verify_auth(auth_type),
          { :ok, token } <- verify_token(jwt),
@@ -50,7 +50,7 @@ defmodule Otaku.Handler do
       IO.inspect image
       { :ok, image }
     else
-      { :input_error, "Expected an image under the name 'image' inside form data but found none." }
+      { :input_error, "Expected 'image' inside form data but found none." }
     end
   end
 
