@@ -13,7 +13,7 @@ defmodule Otaku.MixProject do
 
   def application do
     [
-      applications: [:jwt, :plug_cowboy, :poison],
+      applications: [:jwt, :plug_cowboy, :poison, :jwt, :httpoison],
       extra_applications: [:logger],
       mod: { Otaku.Server, [] }
     ]
