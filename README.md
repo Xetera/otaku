@@ -19,7 +19,7 @@ A simple jwt based image upload server that works off bunny CDN
 
 ### Processing requests
 
-#### /upload
+**POST** /upload
 * **Headers** 
     * Authorization="Bearer $YOUR_GOOGLE_SIGNED_JWT"
     * Content-Type="multipart/form-data"
@@ -27,3 +27,10 @@ A simple jwt based image upload server that works off bunny CDN
     * image: file binary
 
 * **Response**: { "url": "$OTAKU_CDN_URL/$USER_ID/$IMAGE_NAME" }
+
+
+### Todo
+
+- [ ] Rate limiting
+- [ ] Role checks using jwt claims
+- [ ] Separate endpoints that accepts API keys for pre-approved users using ShareX and the like
